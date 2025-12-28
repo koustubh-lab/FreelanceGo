@@ -261,7 +261,7 @@ export default function ChatArea({
                   message.senderId === userId ? "justify-end" : "justify-start"
                 }`}
               >
-                <div className="flex flex-col">
+                <div className="flex flex-col max-w-[70%]">
                   <div
                     className={`${
                       message.senderId === userId

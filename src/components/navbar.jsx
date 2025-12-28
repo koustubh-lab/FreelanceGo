@@ -17,11 +17,7 @@ export default function Navbar() {
           className="mr-6 flex items-center space-x-2 group relative z-10"
         >
           <div className="relative">
-            <img
-              src="/freelancego-logo-old.svg"
-              alt=""
-              className="w-5 h-5 transition-transform group-hover:scale-110 group-hover:rotate-12 duration-300"
-            />
+            <img src="/freelance-go-transparent.svg" alt="" className="h-5" />
             <div className="absolute inset-0 bg-primary/20 blur-md group-hover:bg-primary/30 transition-all rounded-full"></div>
           </div>
           <span className="font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text group-hover:from-primary group-hover:to-primary/80 transition-all duration-300">

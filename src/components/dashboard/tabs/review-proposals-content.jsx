@@ -28,6 +28,12 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { RUPEE } from "@/utils/constants";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.jsx";
 
 const ITEMS_PER_PAGE = 3;
 
@@ -329,7 +335,16 @@ export default function ReviewProposalsContent() {
                       <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
                         <span>Posted: {formatDate(project.createdAt)}</span>
                         <span>•</span>
-                        <span>ID: {project.id}</span>
+                        <TooltipProvider skipDelayDuration={true}>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <span>{project.experienceLevel}</span>
+                            </TooltipTrigger>
+                            <TooltipContent className="bg-white text-black border">
+                              <p>Required Experience Level</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                         {project.category && (
                           <>
                             <span>•</span>

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { format } from "date-fns";
 import {
+  AlertCircle,
   Eye,
   Filter,
   Heart,
@@ -342,7 +343,17 @@ export default function BrowseJobsContent() {
                         onClick={() => handleSubmitProposal(job.id)}
                         className={`${isAlreadyBid ? "opacity-50 pointer-events-none" : ""}`}
                       >
-                        <Send className="mr-2 h-4 w-4" /> Submit Proposal
+                        {isAlreadyBid ? (
+                          <>
+                            <AlertCircle className="mr-2 h-4 w-4" />{" "}
+                            <span>Submitted</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="mr-2 h-4 w-4" />{" "}
+                            <span>Submit Proposal</span>
+                          </>
+                        )}
                       </Button>
                     </div>
                   </CardContent>

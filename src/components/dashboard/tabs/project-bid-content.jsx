@@ -120,7 +120,7 @@ export default function ProjectBidsContent() {
           timeline: bid.timeRequired,
           coverLetter: bid.coverLetter,
           skills: bid.freelancerDto.skills || [],
-          attachments: bid.attachmentPublicUrl ? [bid.attachmentPublicUrl] : [],
+          attachment: bid.attachmentPublicUrl ? bid.attachmentPublicUrl : null,
           submittedAt: bid.submittedAt,
           status: bid.status.toLowerCase(),
           category: bid.category,
@@ -191,11 +191,11 @@ export default function ProjectBidsContent() {
         return "secondary";
       case "shortlisted":
         return "outline";
-      case "interviewed":
+      case "accepted":
         return "default";
       case "hired":
         return "default";
-      case "declined":
+      case "rejected":
         return "destructive";
       default:
         return "outline";
@@ -345,7 +345,10 @@ export default function ProjectBidsContent() {
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
               {jobDetails.jobTitle}
             </h1>
-            <Badge variant="secondary" className="capitalize self-start">
+            <Badge
+              variant={jobDetails.status === "ACTIVE" ? "default" : "secondary"}
+              className="capitalize self-start"
+            >
               {jobDetails.status}
             </Badge>
           </div>
@@ -655,17 +658,6 @@ export default function ProjectBidsContent() {
                   </div>
                 </div>
 
-                {/*{bid.freelancer.bio && (
-                  <div className="space-y-3">
-                    <h5 className="font-semibold">Freelancer Bio</h5>
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <p className="text-sm whitespace-pre-line">
-                        {bid.freelancer.bio}
-                      </p>
-                    </div>
-                  </div>
-                )}*/}
-
                 <div className="space-y-3">
                   <h5 className="font-semibold">Cover Letter</h5>
                   <div className="bg-muted/50 p-4 rounded-lg">
@@ -692,28 +684,20 @@ export default function ProjectBidsContent() {
                   </div>
                 )}
 
-                {bid.proposal.attachments.length > 0 && (
+                {bid.proposal.attachment && (
                   <div className="space-y-3">
                     <h5 className="font-semibold">Attachments</h5>
                     <div className="flex flex-wrap gap-2">
-                      {bid.proposal.attachments.map((attachment, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          size="sm"
-                          className="bg-transparent"
-                          asChild
+                      <Button variant="outline" size="sm" asChild>
+                        <a
+                          href={bid.proposal.attachment}
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
-                          <a
-                            href={attachment}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <FileText className="mr-2 h-4 w-4" />
-                            View Attachment {index + 1}
-                          </a>
-                        </Button>
-                      ))}
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          View Attachment
+                        </a>
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -736,18 +720,13 @@ export default function ProjectBidsContent() {
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t space-y-3 sm:space-y-0">
                   <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-transparent"
-                    >
+                    <Button variant="outline" size="sm">
                       <User className="mr-2 h-4 w-4" />
                       View Profile
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="bg-transparent"
                       onClick={() =>
                         handleChatCreation(
                           jobDetails.clientDto.id,
@@ -760,9 +739,7 @@ export default function ProjectBidsContent() {
                     </Button>
                   </div>
                   <div className="flex items-center space-x-2">
-                    {bid.proposal.status === "new" ||
-                    bid.proposal.status === "pending" ||
-                    bid.proposal.status === "shortlisted" ? (
+                    {bid.proposal.status === "PENDING".toLowerCase() ? (
                       <>
                         <Dialog>
                           <DialogTrigger asChild>

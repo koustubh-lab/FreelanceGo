@@ -188,7 +188,11 @@ export default function DashboardHeader(props) {
             </Sheet>
 
             <a href="/dashboard" className="flex items-center space-x-2">
-              <img src={"/freelancego-logo.svg"} width={20} height={20} />
+              <img
+                src={"/freelance-go-transparent.svg"}
+                className={"h-5"}
+                alt={"Logo"}
+              />
               <span className="font-bold text-lg md:text-xl">FreelanceGo</span>
             </a>
           </div>

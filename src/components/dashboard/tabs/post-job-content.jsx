@@ -1,33 +1,33 @@
-import { apiClient } from "@/api/AxiosServiceApi"
-import FullScreenLoader from "@/components/FullScreenLoader"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { apiClient } from "@/api/AxiosServiceApi";
+import FullScreenLoader from "@/components/FullScreenLoader";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
-import { userRoles } from "@/utils/constants"
-import { format, formatISO, isBefore, startOfToday } from "date-fns"
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { userRoles } from "@/utils/constants";
+import { format, formatISO, isBefore, startOfToday } from "date-fns";
 import {
   AlertCircle,
   ArrowLeft,
@@ -43,10 +43,10 @@ import {
   Upload,
   Users,
   X,
-} from "lucide-react"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { toast } from "sonner"
+} from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const jobCategories = [
   "Web Development",
@@ -57,7 +57,7 @@ const jobCategories = [
   "Data Science",
   "DevOps & Cloud",
   "AI & Machine Learning",
-]
+];
 
 const skillSuggestions = [
   "React",
@@ -80,15 +80,15 @@ const skillSuggestions = [
   "SQL",
   "AWS",
   "Docker",
-]
+];
 
 export default function PostJobContent({ userRole }) {
-  const [currentTab, setCurrentTab] = useState("basics")
-  const [selectedSkills, setSelectedSkills] = useState([])
-  const [customSkill, setCustomSkill] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [attachment, setAttachment] = useState(null)
-  const navigate = useNavigate()
+  const [currentTab, setCurrentTab] = useState("basics");
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [customSkill, setCustomSkill] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [attachment, setAttachment] = useState(null);
+  const navigate = useNavigate();
 
   const [jobData, setJobData] = useState({
     jobTitle: "",
@@ -107,7 +107,7 @@ export default function PostJobContent({ userRole }) {
     featuredListing: false,
     projectStartTime: null,
     projectEndTime: null,
-  })
+  });
 
   if (userRole === userRoles.FREELANCER) {
     return (
@@ -129,200 +129,204 @@ export default function PostJobContent({ userRole }) {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   // Skill Management
   const addSkill = (skill) => {
     if (skill && !selectedSkills.includes(skill)) {
-      setSelectedSkills([...selectedSkills, skill])
+      setSelectedSkills([...selectedSkills, skill]);
     }
-  }
+  };
   const removeSkill = (skill) => {
-    setSelectedSkills(selectedSkills.filter((s) => s !== skill))
-  }
+    setSelectedSkills(selectedSkills.filter((s) => s !== skill));
+  };
   const addCustomSkill = () => {
     if (customSkill.trim()) {
-      addSkill(customSkill.trim())
-      setCustomSkill("")
+      addSkill(customSkill.trim());
+      setCustomSkill("");
     }
-  }
+  };
 
   // Screening Questions
   const addScreeningQuestion = () => {
     setJobData({
       ...jobData,
       screeningQuestions: [...jobData.screeningQuestions, ""],
-    })
-  }
+    });
+  };
   const updateScreeningQuestion = (index, value) => {
-    const updated = [...jobData.screeningQuestions]
-    updated[index] = value
-    setJobData({ ...jobData, screeningQuestions: updated })
-  }
+    const updated = [...jobData.screeningQuestions];
+    updated[index] = value;
+    setJobData({ ...jobData, screeningQuestions: updated });
+  };
   const removeScreeningQuestion = (index) => {
-    const updated = jobData.screeningQuestions.filter((_, i) => i !== index)
-    setJobData({ ...jobData, screeningQuestions: updated })
-  }
+    const updated = jobData.screeningQuestions.filter((_, i) => i !== index);
+    setJobData({ ...jobData, screeningQuestions: updated });
+  };
 
   const handleFileUpload = (event) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
-      const maxSize = 500 * 1024 // 500 KB in bytes
+      const maxSize = 500 * 1024; // 500 KB in bytes
       if (file.size > maxSize) {
-        toast.warning("File size exceeds 500 KB. Please select a smaller file.")
-        return
+        toast.warning(
+          "File size exceeds 500 KB. Please select a smaller file.",
+        );
+        return;
       }
-      setAttachment(file)
-      toast.success("File uploaded successfully!")
+      setAttachment(file);
+      toast.success("File uploaded successfully!");
     } else {
-      toast.warning("File upload failed. Please try again.")
+      toast.warning("File upload failed. Please try again.");
     }
-  }
+  };
 
   const removeAttachment = () => {
-    setAttachment(null)
+    setAttachment(null);
     // Reset the file input
-    const fileInput = document.getElementById("file-upload")
+    const fileInput = document.getElementById("file-upload");
     if (fileInput) {
-      fileInput.value = ""
+      fileInput.value = "";
     }
-    toast.info("File removed")
-  }
+    toast.info("File removed");
+  };
 
   // Validation
   const validateFields = () => {
     // Basic info validation
     if (!jobData.jobTitle.trim()) {
-      toast.error("Job title is required")
-      setCurrentTab("basics")
-      return false
+      toast.error("Job title is required");
+      setCurrentTab("basics");
+      return false;
     }
     if (jobData.jobTitle.trim().length < 10) {
-      toast.error("Job title must be at least 10 characters long")
-      setCurrentTab("basics")
-      return false
+      toast.error("Job title must be at least 10 characters long");
+      setCurrentTab("basics");
+      return false;
     }
     if (!jobData.category) {
-      toast.error("Category is required")
-      setCurrentTab("basics")
-      return false
+      toast.error("Category is required");
+      setCurrentTab("basics");
+      return false;
     }
     if (!jobData.experienceLevel) {
-      toast.error("Experience level is required")
-      setCurrentTab("basics")
-      return false
+      toast.error("Experience level is required");
+      setCurrentTab("basics");
+      return false;
     }
     if (selectedSkills.length === 0) {
-      toast.error("At least one skill is required")
-      setCurrentTab("basics")
-      return false
+      toast.error("At least one skill is required");
+      setCurrentTab("basics");
+      return false;
     }
     if (selectedSkills.length > 15) {
-      toast.error("Maximum 15 skills allowed")
-      setCurrentTab("basics")
-      return false
+      toast.error("Maximum 15 skills allowed");
+      setCurrentTab("basics");
+      return false;
     }
 
     // Details validation
     if (!jobData.jobDescription.trim()) {
-      toast.error("Job description is required")
-      setCurrentTab("details")
-      return false
+      toast.error("Job description is required");
+      setCurrentTab("details");
+      return false;
     }
     if (jobData.jobDescription.trim().length < 50) {
-      toast.error("Job description must be at least 50 characters long")
-      setCurrentTab("details")
-      return false
+      toast.error("Job description must be at least 50 characters long");
+      setCurrentTab("details");
+      return false;
     }
     if (!jobData.requirement.trim()) {
-      toast.error("Job requirements are required")
-      setCurrentTab("details")
-      return false
+      toast.error("Job requirements are required");
+      setCurrentTab("details");
+      return false;
     }
     if (jobData.requirement.trim().length < 20) {
-      toast.error("Requirements must be at least 20 characters long")
-      setCurrentTab("details")
-      return false
+      toast.error("Requirements must be at least 20 characters long");
+      setCurrentTab("details");
+      return false;
     }
 
     // Budget validation
     if (!jobData.budget) {
-      toast.error("Project budget is required")
-      setCurrentTab("details")
-      return false
+      toast.error("Project budget is required");
+      setCurrentTab("details");
+      return false;
     }
     if (parseFloat(jobData.budget) <= 0) {
-      toast.error("Budget must be greater than 0")
-      setCurrentTab("details")
-      return false
+      toast.error("Budget must be greater than 0");
+      setCurrentTab("details");
+      return false;
     }
     if (parseFloat(jobData.budget) > 10000000) {
-      toast.error("Budget cannot exceed 10,000,000")
-      setCurrentTab("details")
-      return false
+      toast.error("Budget cannot exceed 10,000,000");
+      setCurrentTab("details");
+      return false;
     }
 
     // Date validation
     if (!jobData.projectStartTime) {
-      toast.error("Project start date is required")
-      setCurrentTab("details")
-      return false
+      toast.error("Project start date is required");
+      setCurrentTab("details");
+      return false;
     }
     if (!jobData.projectEndTime) {
-      toast.error("Project end date is required")
-      setCurrentTab("details")
-      return false
+      toast.error("Project end date is required");
+      setCurrentTab("details");
+      return false;
     }
 
-    const today = startOfToday()
+    const today = startOfToday();
     if (isBefore(new Date(jobData.projectStartTime), today)) {
-      toast.error("Project start date cannot be in the past")
-      setCurrentTab("details")
-      return false
+      toast.error("Project start date cannot be in the past");
+      setCurrentTab("details");
+      return false;
     }
     if (isBefore(new Date(jobData.projectEndTime), today)) {
-      toast.error("Project end date cannot be in the past")
-      setCurrentTab("details")
-      return false
+      toast.error("Project end date cannot be in the past");
+      setCurrentTab("details");
+      return false;
     }
     if (
       isBefore(
         new Date(jobData.projectEndTime),
-        new Date(jobData.projectStartTime)
+        new Date(jobData.projectStartTime),
       )
     ) {
-      toast.error("End date cannot be before start date")
-      setCurrentTab("details")
-      return false
+      toast.error("End date cannot be before start date");
+      setCurrentTab("details");
+      return false;
     }
 
     // Screening questions validation
-    const nonEmptyQuestions = jobData.screeningQuestions.filter((q) => q.trim())
+    const nonEmptyQuestions = jobData.screeningQuestions.filter((q) =>
+      q.trim(),
+    );
     if (
       nonEmptyQuestions.length > 0 &&
       nonEmptyQuestions.length !== jobData.screeningQuestions.length
     ) {
-      toast.error("Please remove empty screening questions or fill them in")
-      setCurrentTab("details")
-      return false
+      toast.error("Please remove empty screening questions or fill them in");
+      setCurrentTab("details");
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   const handlePostJob = async () => {
-    if (!validateFields()) return
+    if (!validateFields()) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
       // Create FormData object
-      const formData = new FormData()
+      const formData = new FormData();
 
       // Filter out empty screening questions
       const filteredScreeningQuestions = jobData.screeningQuestions.filter(
-        (q) => q.trim()
-      )
+        (q) => q.trim(),
+      );
 
       // Create the job DTO object
       const jobDto = {
@@ -347,17 +351,17 @@ export default function PostJobContent({ userRole }) {
         projectStartTime: jobData.projectStartTime,
         projectEndTime: jobData.projectEndTime,
         requiredSkills: selectedSkills,
-      }
+      };
 
       // Append job data as JSON blob
       formData.append(
         "job",
-        new Blob([JSON.stringify(jobDto)], { type: "application/json" })
-      )
+        new Blob([JSON.stringify(jobDto)], { type: "application/json" }),
+      );
 
       // Append file if exists
       if (attachment) {
-        formData.append("file", attachment)
+        formData.append("file", attachment);
       }
 
       const response = await apiClient.post(
@@ -367,24 +371,24 @@ export default function PostJobContent({ userRole }) {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
-      )
+        },
+      );
 
       if (response.status === 200) {
-        toast.success("Job posted successfully!")
-        navigate("/dashboard/job-posts")
+        toast.success("Job posted successfully!");
+        navigate("/dashboard/job-posts");
       }
     } catch (error) {
-      console.error("Error posting job:", error)
+      console.error("Error posting job:", error);
       if (error.response?.data?.message) {
-        toast.error(error.response.data.message)
+        console.error(error.response.data.message);
       } else {
-        toast.error("Something went wrong while posting the job")
+        console.error("Something went wrong while posting the job");
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const isTabComplete = (tab) => {
     switch (tab) {
@@ -394,7 +398,7 @@ export default function PostJobContent({ userRole }) {
           jobData.category &&
           jobData.experienceLevel &&
           selectedSkills.length > 0
-        )
+        );
       case "details":
         return (
           jobData.jobDescription &&
@@ -402,15 +406,15 @@ export default function PostJobContent({ userRole }) {
           jobData.budget &&
           jobData.projectStartTime &&
           jobData.projectEndTime
-        )
+        );
       case "attachment":
-        return true // Optional tab
+        return true; // Optional tab
       case "review":
-        return true
+        return true;
       default:
-        return false
+        return false;
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -532,7 +536,7 @@ export default function PostJobContent({ userRole }) {
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select experience level" />
                   </SelectTrigger>
-                  <SelectContent className="w-1/2" align="end">
+                  <SelectContent>
                     <SelectItem value="ENTRY_LEVEL">Entry Level</SelectItem>
                     <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                     <SelectItem value="EXPERT">Expert</SelectItem>
@@ -574,7 +578,7 @@ export default function PostJobContent({ userRole }) {
                           variant="outline"
                           size="sm"
                           onClick={() => addSkill(skill)}
-                          className="text-xs bg-transparent hover:bg-primary"
+                          className="text-xs bg-transparent hover:bg-primary hover:text-background"
                           disabled={selectedSkills.length >= 15}
                         >
                           <Plus className="mr-1 h-3 w-3" />
@@ -728,13 +732,13 @@ export default function PostJobContent({ userRole }) {
                           })
                         }
                         disabled={(date) => {
-                          const today = startOfToday()
+                          const today = startOfToday();
                           const startDate = jobData.projectStartTime
                             ? new Date(jobData.projectStartTime)
-                            : today
+                            : today;
                           return (
                             isBefore(date, today) || isBefore(date, startDate)
-                          )
+                          );
                         }}
                         initialFocus
                       />
@@ -940,10 +944,10 @@ export default function PostJobContent({ userRole }) {
                           {jobData.projectStartTime && jobData.projectEndTime
                             ? `${format(
                                 new Date(jobData.projectStartTime),
-                                "MMM dd, yyyy"
+                                "MMM dd, yyyy",
                               )} - ${format(
                                 new Date(jobData.projectEndTime),
-                                "MMM dd, yyyy"
+                                "MMM dd, yyyy",
                               )}`
                             : "Not set"}
                         </p>
@@ -1027,5 +1031,5 @@ export default function PostJobContent({ userRole }) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

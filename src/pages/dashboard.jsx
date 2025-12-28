@@ -4,6 +4,7 @@ import FullscreenLoader from "@/components/FullScreenLoader";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 export default function Dashboard() {
   const { userRole, authLoading, isAuthenticated } = useAuth();
@@ -26,6 +27,13 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen max-h-screen overflow-hidden bg-background flex flex-col">
+      <Helmet>
+        <title>
+          FG - {userRole === "freelancer" ? "Freelancer" : "Client"} Dashboard
+        </title>
+        <meta name="description" content="Dashboard" />
+        <meta name="keywords" content="Dashboard" />
+      </Helmet>
       {/* Dashboard Header */}
       <div>
         <DashboardHeader

@@ -24,20 +24,35 @@ import {
   AlertCircle,
   Calendar,
   CheckCircle,
+  ChevronDown,
+  ChevronUp,
   Clock,
+  Edit,
   ExternalLink,
   Eye,
   FileText,
   Filter,
   IndianRupee,
+  Info,
+  MoreVertical,
   Pause,
+  Play,
   Plus,
   Search,
   Trash,
   Users,
+  View,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu.jsx";
 
 export default function JobPostsContent({ userRole }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,8 +62,10 @@ export default function JobPostsContent({ userRole }) {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalJobs, setTotalJobs] = useState(0);
+  const [expandedJobs, setExpandedJobs] = useState({});
   const { authLoading } = useAuth();
 
+  const navigate = useNavigate();
   const CURRENT_THEME = localStorage.getItem("theme");
 
   // 🧩 Fetch paginated job posts
@@ -84,33 +101,48 @@ export default function JobPostsContent({ userRole }) {
     fetchPosts(0, statusFilter, searchTerm);
   }, [statusFilter, searchTerm]);
 
-  const getStatusColor = (status) => {
-    switch (status?.toUpperCase()) {
-      case "ACTIVE":
-        return "default";
-      case "COMPLETED":
-        return "secondary";
-      case "PAUSED":
+  const getPhaseColor = (phase) => {
+    switch (phase?.toUpperCase()) {
+      case "PENDING":
         return "outline";
-      case "DRAFT":
+      case "IN_PROGRESS":
+        return "default";
+      case "SUCCESS":
+        return "secondary";
+      case "FAILED":
         return "destructive";
       default:
         return "outline";
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status?.toUpperCase()) {
-      case "ACTIVE":
+  const getPhaseIcon = (phase) => {
+    switch (phase?.toUpperCase()) {
+      case "PENDING":
+        return <Clock className="h-4 w-4" />;
+      case "IN_PROGRESS":
+        return <Play className="h-4 w-4" />;
+      case "SUCCESS":
         return <CheckCircle className="h-4 w-4" />;
-      case "COMPLETED":
-        return <CheckCircle className="h-4 w-4" />;
-      case "PAUSED":
-        return <Pause className="h-4 w-4" />;
-      case "DRAFT":
-        return <FileText className="h-4 w-4" />;
+      case "FAILED":
+        return <AlertCircle className="h-4 w-4" />;
       default:
-        return null;
+        return <FileText className="h-4 w-4" />;
+    }
+  };
+
+  const getPhaseBorderColor = (phase) => {
+    switch (phase?.toUpperCase()) {
+      case "PENDING":
+        return "border-l-yellow-500";
+      case "IN_PROGRESS":
+        return "border-l-blue-500";
+      case "SUCCESS":
+        return "border-l-green-500";
+      case "FAILED":
+        return "border-l-red-500";
+      default:
+        return "border-l-gray-300";
     }
   };
 
@@ -118,6 +150,19 @@ export default function JobPostsContent({ userRole }) {
     if (newPage >= 0 && newPage < totalPages) {
       fetchPosts(newPage);
     }
+  };
+
+  const toggleJobDescription = (jobId) => {
+    setExpandedJobs((prev) => ({
+      ...prev,
+      [jobId]: !prev[jobId],
+    }));
+  };
+
+  const shouldShowToggle = (description) => {
+    if (!description) return false;
+    // Only show toggle if description is longer than 200 characters
+    return description.length > 200;
   };
 
   // 🧠 If user is freelancer — block job management
@@ -158,14 +203,14 @@ export default function JobPostsContent({ userRole }) {
             Manage your posted jobs and track their performance
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex justify-end *:flex-1 sm:*:flex-none items-center space-x-2">
           <Button variant="outline" size="sm" className="bg-transparent">
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={() => navigate("/dashboard/post-job")}>
             <Plus className="h-4 w-4" />
-            Post New Job
+            <span className="inline ml-2">Post New Job</span>
           </Button>
         </div>
       </div>
@@ -191,7 +236,7 @@ export default function JobPostsContent({ userRole }) {
                   setPage(0);
                 }}
               >
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="w-full sm:w-[150px]">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -224,33 +269,75 @@ export default function JobPostsContent({ userRole }) {
               {jobPosts.map((job) => (
                 <div
                   key={job.id}
-                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  className={`border rounded-lg border-l-4 ${getPhaseBorderColor(job.phase)} p-4 sm:p-6 hover:shadow-md transition-shadow`}
                 >
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-2 lg:space-y-0">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="font-semibold text-lg">
-                              {job.jobTitle}
-                            </h3>
+                  <div className="space-y-4">
+                    {/* Title with inline phase badge */}
+                    <div className="flex flex-col space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 flex flex-col sm:flex-row sm:justify-between">
+                          <h3 className="font-semibold text-base sm:text-lg break-words">
+                            {job.jobTitle}
+                          </h3>
+                          {/* Phase badge inline with title on mobile, separate on larger screens */}
+                          <div className="flex items-center gap-2">
                             <Badge
-                              variant={getStatusColor(job.status)}
-                              className="flex items-center space-x-1"
+                              variant={getPhaseColor(job.phase)}
+                              className="flex items-center space-x-1 w-fit"
                             >
-                              {getStatusIcon(job.status)}
-                              <span>{job.status}</span>
+                              <span className="text-xs">{job.phase}</span>
                             </Badge>
                           </div>
-                          <p className="text-muted-foreground text-sm mb-2">
-                            {job.clientDto?.companyName || "No category"}
-                          </p>
-                          <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
-                            {job.jobDescription}
-                          </p>
+                        </div>
+                      </div>
 
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {job.requiredSkills?.map((skill) => (
+                      {/* Job Description with Toggle */}
+                      <div className="mt-2">
+                        <p
+                          className={`text-sm text-muted-foreground whitespace-pre-wrap ${
+                            shouldShowToggle(job.jobDescription) &&
+                            !expandedJobs[job.id]
+                              ? "line-clamp-3"
+                              : ""
+                          }`}
+                        >
+                          {job.jobDescription}
+                        </p>
+                        {shouldShowToggle(job.jobDescription) && (
+                          <button
+                            onClick={() => toggleJobDescription(job.id)}
+                            className="text-xs text-primary hover:underline font-medium inline-flex items-center gap-1"
+                            aria-label={
+                              expandedJobs[job.id]
+                                ? "Show less description"
+                                : "Show more description"
+                            }
+                          >
+                            {expandedJobs[job.id] ? (
+                              <>
+                                Show less
+                                <ChevronUp className="h-3 w-3" />
+                              </>
+                            ) : (
+                              <>
+                                Show more
+                                <ChevronDown className="h-3 w-3" />
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className={"grid grid-cols-1 sm:grid-cols-2 gap-2"}>
+                      {/* Skills */}
+                      {job.requiredSkills?.length > 0 && (
+                        <div className={"space-y-2"}>
+                          <h3 className={"text-xs font-medium"}>
+                            Required Skills:
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {job.requiredSkills.map((skill) => (
                               <Badge
                                 key={skill}
                                 variant="secondary"
@@ -260,83 +347,134 @@ export default function JobPostsContent({ userRole }) {
                               </Badge>
                             ))}
                           </div>
+                        </div>
+                      )}
 
-                          {job.file && (
-                            <div className="mb-3 text-sm">
-                              <a
-                                href={job.file}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                      {/* Attachment */}
+                      {job.file && (
+                        <div className={"space-y-1"}>
+                          <h3 className={"text-xs font-medium"}>Attachment:</h3>
+                          <div className="text-sm">
+                            <a
+                              href={job.file}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Button
+                                variant="link"
+                                size="sm"
+                                className="p-0 h-auto"
                               >
-                                <Button
-                                  variant="link"
-                                  size="sm"
-                                  className="p-0"
-                                >
-                                  <span>View Attachment</span>
-                                  <ExternalLink className="h-4 w-4" />{" "}
-                                </Button>
-                              </a>
-                            </div>
-                          )}
-
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground *:border *:px-2 *:py-1 *:bg-muted *:rounded-md *:text-xs md:*:test-sm">
-                            <div className="flex items-center space-x-1">
-                              <IndianRupee className="h-4 w-4" />
-                              <span>
-                                {job.budget
-                                  ? job.budget.toLocaleString()
-                                  : "N/A"}
-                                {job.budgetType === "hourly" && "/hr"}
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Users className="h-4 w-4" />
-                              <span>{job.proposalsCount || 0} proposals</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Calendar className="h-4 w-4" />
-                              <span>
-                                Posted:{" "}
-                                {format(new Date(job.createdAt), "MMM d, yyyy")}
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Clock className="h-4 w-4" />
-                              <span>
-                                Deadline:{" "}
-                                {format(
-                                  new Date(job.projectEndTime),
-                                  "MMM d, yyyy",
-                                )}
-                              </span>
-                            </div>
+                                <span>Open Link</span>
+                                <ExternalLink className="ml-1 h-3 w-3" />
+                              </Button>
+                            </a>
                           </div>
                         </div>
+                      )}
+                    </div>
 
-                        <div className="flex items-center space-x-2">
-                          <Link to={`/dashboard/job/${job.id}`}>
-                            <Button variant="outline">
-                              <Eye className="mr-2 h-4 w-4" />
-                              View
-                            </Button>
-                          </Link>
-                          <Button variant="destructive" size={"sm"}>
-                            <Trash className="h-3 w-3" />
-                          </Button>
-                        </div>
+                    {/* Job Metadata */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2 bg-muted/50 border px-3 py-2 rounded-md">
+                        <IndianRupee className="h-4 w-4 shrink-0" />
+                        <span className="truncate">
+                          Budget:{" "}
+                          {job.budget ? job.budget.toLocaleString() : "N/A"}
+                        </span>
                       </div>
+                      <div className="flex items-center gap-2 bg-muted/50 border px-3 py-2 rounded-md">
+                        <Users className="h-4 w-4 shrink-0" />
+                        <span className="truncate">
+                          No of Proposals: {job.proposalsCount || 0}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-muted/50 border px-3 py-2 rounded-md">
+                        <Calendar className="h-4 w-4 shrink-0" />
+                        <span className="truncate">
+                          Posted:{" "}
+                          {format(new Date(job.createdAt), "MMM d, yyyy")}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-muted/50 border px-3 py-2 rounded-md">
+                        <Clock className="h-4 w-4 shrink-0" />
+                        <span className="truncate">
+                          Deadline:{" "}
+                          {format(new Date(job.projectEndTime), "MMM d, yyyy")}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                      <Link to={`/dashboard/job/${job.id}`} className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </Button>
+                      </Link>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="sm:w-auto w-full"
+                          >
+                            <MoreVertical className="h-4 w-4 sm:mr-0 mr-2" />
+                            <span className="sm:hidden">More Actions</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          side={"top"}
+                          className="w-48"
+                        >
+                          <DropdownMenuItem
+                            className={`${job.phase !== "PENDING" ? "pointer-events-none opacity-50" : ""}`}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className={
+                              job.proposalsCount
+                                ? ""
+                                : "pointer-events-none opacity-50"
+                            }
+                          >
+                            <Eye className="mr-2 h-4 w-4" />
+                            Review Bids
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-500">
+                            <Trash className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                          {job.status === "ACTIVE" && (
+                            <DropdownMenuItem className="text-primary">
+                              <Pause className="mr-2 h-4 w-4" />
+                              Pause
+                            </DropdownMenuItem>
+                          )}
+                          {job.status === "INACTIVE" &&
+                            job.phase === "PENDING" && (
+                              <DropdownMenuItem className="text-green-500">
+                                <Play className="mr-2 h-4 w-4" />
+                                Resume
+                              </DropdownMenuItem>
+                            )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </div>
               ))}
 
               {/* Pagination Controls */}
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4">
+                <p className="text-sm text-muted-foreground text-center sm:text-left">
                   Page {page + 1} of {totalPages} ({totalJobs} total jobs)
                 </p>
-                <div className="space-x-2">
+                <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"

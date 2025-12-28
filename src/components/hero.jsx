@@ -1,5 +1,5 @@
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   Briefcase,
@@ -7,15 +7,15 @@ import {
   Star,
   TrendingUp,
   Users,
-} from "lucide-react"
-import { useEffect, useState } from "react"
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function Hero() {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    setIsVisible(true)
-  }, [])
+    setIsVisible(true);
+  }, []);
 
   return (
     <section className="relative container flex min-h-[calc(100vh-3.5rem)] max-w-screen-2xl flex-col items-center justify-center space-y-8 text-center px-4 overflow-hidden">
@@ -43,7 +43,7 @@ export default function Hero() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         }`}
       >
-        <h1 className="relative font-poppins">
+        <h1 className="relative">
           <span className="block bg-gradient-to-br from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-transparent leading-tight">
             Find Your Perfect
           </span>
@@ -81,12 +81,11 @@ export default function Hero() {
           size={"lg"}
           className="text-white bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 relative overflow-hidden group"
         >
-              <span className="relative z-10 flex items-center gap-1">
-                Hire Freelancers
-                <Sparkles className="h-3 w-3 opacity-30 group-hover:opacity-100 transition-opacity"/>
-              </span>
-          <div
-            className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+          <span className="relative z-10 flex items-center gap-1">
+            Hire Freelancers
+            <Sparkles className="h-3 w-3 opacity-30 group-hover:opacity-100 transition-opacity" />
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
         </Button>
         <Button
           variant="outline"
@@ -160,5 +159,5 @@ export default function Hero() {
         }
       `}</style>
     </section>
-  )
+  );
 }
